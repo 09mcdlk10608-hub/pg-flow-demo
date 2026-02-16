@@ -20,6 +20,7 @@
     .choice, .btn, .ghost {
       padding: 14px 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #444;
       background: #222; color: #fff; cursor: pointer;
+      text-align: center; display: inline-block; text-decoration: none;
     }
     .choice:hover, .btn:hover { border-color: var(--accent); }
     .progress { margin-top: 10px; color:#888; text-align: right; }
@@ -28,7 +29,6 @@
           border: 1px solid #333; border-radius: 10px; padding: 10px 12px; }
     .pg h3 { margin: 0 0 2px; font-size: 1rem; }
     .comment { margin: 6px 0 0; line-height: 1.4; }
-    .btn { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
     footer { margin-top: 10px; color:#888; text-align: right; }
   </style>
 </head>
@@ -160,7 +160,6 @@
     };
     // ====== 内蔵データここまで ======
 
-    // ---- 状態管理（results方式）----
     const state = { step: "q1", results: null };
 
     function findNode(id) {
@@ -210,21 +209,38 @@
       const list = resolvePhotographers(ids);
 
       const wrap = document.getElementById('pgList');
-      wrap.innerHTML = list.map(p => `
-        <article class="pg">
-          <div class="pg-meta">
-            <h3>${p.name}</h3>
-            ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
-          </div>
-          ${p.portfolio_url || DEFAULT_PORTFOLIO_URL}
-            作品を見る
-          </a>
-        </article>
-      `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
+      wrap.innerHTML = list.map(p => {
+        const url = p.portfolio_url || DEFAULT_PORTFOLIO_URL;
+        const safeUrl = String(url);
+        return `
+          <article class="pg">
+            <div class="pg-meta">
+              <h3>${p.name}</h3>
+              ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
+            </div>
+            ${safeUrl}
+              作品を見る
+            </a>
+          </article>
+        `;
+      }).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
 
       document.getElementById('card').classList.add('hidden');
       const r = document.getElementById('result');
       r.classList.remove('hidden');
+
+      // —— 確実に開くためのフォールバック：window.open を明示的に実行 ——
+      document.querySelectorAll('.open-link').forEach(a => {
+        a.addEventListener('click', (ev) => {
+          // 一部ブラウザで a.click() が無視されるケースに対応
+          const href = ev.currentTarget.getAttribute('data-href');
+          if (!href) return;
+          // 既定の遷移を尊重しつつ、念のため window.open を試行
+          const w = window.open(href, '_blank', 'noopener');
+          // ポップアップブロック対策：失敗したら同タブ遷移
+          if (!w) { window.location.href = href; }
+        }, { passive: true });
+      });
 
       document.getElementById('restart').onclick = () => {
         state.step = "q1";
