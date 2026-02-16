@@ -1,0 +1,117 @@
+{
+  "nodes": [
+    {
+      "id": "q1",
+      "question": "被写体はどちらに近いですか？",
+      "progress": "1 / 4",
+      "choices": [
+        { "label": "女性（WOMAN）", "add_tags": ["woman"], "next": "q2" },
+        { "label": "男性（MAN）", "add_tags": ["man"], "next": "q2" }
+      ]
+    },
+    {
+      "id": "q2",
+      "question": "雰囲気はどちらに近いですか？",
+      "progress": "2 / 4",
+      "choices": [
+        { "label": "スタイリッシュ", "add_tags": ["stylish"], "next": "q3" },
+        { "label": "ナチュラル", "add_tags": ["natural"], "next": "q3" }
+      ]
+    },
+    {
+      "id": "q3",
+      "question": "撮影場所はどちらが近いですか？",
+      "progress": "3 / 4",
+      "choices": [
+        { "label": "屋外ロケーション", "add_tags": ["outdoor"], "next": "q4" },
+        { "label": "スタジオ／屋内", "add_tags": ["indoor"], "next": "q4" }
+      ]
+    },
+    {
+      "id": "q4",
+      "question": "色味のイメージは？",
+      "progress": "4 / 4",
+      "choices": [
+        { "label": "やさしい／淡色", "add_tags": ["soft"], "next": "FINAL" },
+        { "label": "コントラスト／濃色", "add_tags": ["contrast"], "next": "FINAL" }
+      ]
+    }
+  ],
+  "photographers": [
+    {
+      "name": "Shiori",
+      "tags": ["woman", "natural", "soft", "indoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto"
+    },
+    {
+      "name": "Kenji",
+      "tags": ["man", "stylish", "contrast", "indoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Rio",
+      "tags": ["woman", "stylish", "outdoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Tatsuki",
+      "tags": ["man", "stylish", "outdoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Konishi",
+      "tags": ["man", "natural", "soft", "outdoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Daisuke",
+      "tags": ["man", "natural", "indoor", "soft"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Bessy",
+      "tags": ["woman", "natural", "outdoor", "soft"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Motti",
+      "tags": ["woman", "natural", "outdoor", "soft"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Uchida / Zacky",
+      "tags": ["man", "stylish", "indoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Taihei",
+      "tags": ["man", "stylish", "indoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Takuya",
+      "tags": ["man", "stylish", "outdoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Iwami",
+      "tags": ["man", "stylish", "outdoor", "contrast"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Reika",
+      "tags": ["woman", "natural", "soft", "indoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Honoka",
+      "tags": ["woman", "natural", "soft", "outdoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    },
+    {
+      "name": "Zacky",
+      "tags": ["man", "stylish", "contrast", "indoor"],
+      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
+    }
+  ]
+}
