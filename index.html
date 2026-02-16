@@ -53,7 +53,10 @@
   </main>
 
   <script>
-    // ====== ここにデータを内蔵（data.json の代わり）======
+    // ====== 設定：デフォルト遷移先（神戸一覧） ======
+    const DEFAULT_PORTFOLIO_URL = "https://www.la-viephoto.com/photo_g/kobe";
+
+    // ====== データ（data.json を内蔵）======
     const DATA = {
       "nodes": [
         { "id": "q1", "question": "好きな写真の雰囲気は？", "progress": "1 / 4",
@@ -133,30 +136,31 @@
         }
       ],
       "photographers": [
-        { "id": "taihei",  "name": "taihei",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "kenji",   "name": "kenji",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "taihei",  "name": "taihei",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "kenji",   "name": "kenji",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "shiori",  "name": "shiori",  "comment": "寄り添いタイプ。二人の雰囲気＋おしゃれな写真を残せる", "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto" },
-        { "id": "tatsuki", "name": "tatsuki", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "tatsuki", "name": "tatsuki", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
 
-        { "id": "takuya",  "name": "takuya",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "iwami",   "name": "iwami",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "Rio",     "name": "Rio",     "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "takuya",  "name": "takuya",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "iwami",   "name": "iwami",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "Rio",     "name": "Rio",     "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
 
-        { "id": "konishi", "name": "konishi", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "daisuke", "name": "daisuke", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "konishi", "name": "konishi", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "daisuke", "name": "daisuke", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
 
-        { "id": "zacky",   "name": "zacky",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "uchida",  "name": "uchida",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "zacky",   "name": "zacky",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "uchida",  "name": "uchida",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
 
-        { "id": "bessy",   "name": "bessy",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "Reika",   "name": "Reika",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "bessy",   "name": "bessy",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "Reika",   "name": "Reika",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
 
-        { "id": "motti",   "name": "motti",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
-        { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" }
+        { "id": "motti",   "name": "motti",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
+        { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" }
       ]
     };
     // ====== 内蔵データここまで ======
 
+    // ---- 状態管理（results方式）----
     const state = { step: "q1", results: null };
 
     function findNode(id) {
@@ -212,10 +216,9 @@
             <h3>${p.name}</h3>
             ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
           </div>
-          ${p.portfolio_url ? `
-            ${p.portfolio_url}
-              作品を見る
-            </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`}
+          ${p.portfolio_url || DEFAULT_PORTFOLIO_URL}
+            作品を見る
+          </a>
         </article>
       `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
 
