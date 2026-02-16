@@ -2,116 +2,134 @@
   "nodes": [
     {
       "id": "q1",
-      "question": "被写体はどちらに近いですか？",
+      "question": "好きな写真の雰囲気は？",
       "progress": "1 / 4",
       "choices": [
-        { "label": "女性（WOMAN）", "add_tags": ["woman"], "next": "q2" },
-        { "label": "男性（MAN）", "add_tags": ["man"], "next": "q2" }
+        { "label": "スタイリッシュ", "next": "q2_stylish" },
+        { "label": "ナチュラル",     "next": "q2_natural" }
       ]
     },
+
     {
-      "id": "q2",
-      "question": "雰囲気はどちらに近いですか？",
+      "id": "q2_stylish",
+      "question": "どんな人に撮ってもらいたい？",
       "progress": "2 / 4",
       "choices": [
-        { "label": "スタイリッシュ", "add_tags": ["stylish"], "next": "q3" },
-        { "label": "ナチュラル", "add_tags": ["natural"], "next": "q3" }
+        { "label": "楽しい",  "next": "q3_stylish_fun" },
+        { "label": "寄り添い","next": "q3_stylish_yorisoi" }
       ]
     },
     {
-      "id": "q3",
-      "question": "撮影場所はどちらが近いですか？",
+      "id": "q2_natural",
+      "question": "どんな人に撮ってもらいたい？",
+      "progress": "2 / 4",
+      "choices": [
+        { "label": "楽しい",  "next": "q3_natural_fun" },
+        { "label": "寄り添い","next": "q3_natural_yorisoi" }
+      ]
+    },
+
+    /* --- スタイリッシュ × 楽しい --- */
+    {
+      "id": "q3_stylish_fun",
+      "question": "好きな色味は？",
       "progress": "3 / 4",
       "choices": [
-        { "label": "屋外ロケーション", "add_tags": ["outdoor"], "next": "q4" },
-        { "label": "スタジオ／屋内", "add_tags": ["indoor"], "next": "q4" }
+        { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_fun" },
+        { "label": "上品で洗練されている",     "results": ["tatsuki"] }
       ]
     },
     {
-      "id": "q4",
-      "question": "色味のイメージは？",
+      "id": "q4_gender_stylish_fun",
+      "question": "フォトグラファーの性別は？",
       "progress": "4 / 4",
       "choices": [
-        { "label": "やさしい／淡色", "add_tags": ["soft"], "next": "FINAL" },
-        { "label": "コントラスト／濃色", "add_tags": ["contrast"], "next": "FINAL" }
+        { "label": "MAN",   "results": ["taihei", "kenji"] },
+        { "label": "WOMAN", "results": ["shiori"] }
+      ]
+    },
+
+    /* --- スタイリッシュ × 寄り添い --- */
+    {
+      "id": "q3_stylish_yorisoi",
+      "question": "好きな色味は？",
+      "progress": "3 / 4",
+      "choices": [
+        { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_yorisoi" },
+        { "label": "上品で洗練されている",     "results": ["Rio"] }
+      ]
+    },
+    {
+      "id": "q4_gender_stylish_yorisoi",
+      "question": "フォトグラファーの性別は？",
+      "progress": "4 / 4",
+      "choices": [
+        { "label": "MAN",   "results": ["takuya"] },
+        { "label": "WOMAN", "results": ["iwami"] }
+      ]
+    },
+
+    /* --- ナチュラル × 楽しい --- */
+    {
+      "id": "q3_natural_fun",
+      "question": "好きな色味は？",
+      "progress": "3 / 4",
+      "choices": [
+        { "label": "はっきり",       "results": ["konishi", "daisuke"] },
+        { "label": "淡い・優しい",   "results": ["zacky", "uchida"] }
+      ]
+    },
+
+    /* --- ナチュラル × 寄り添い --- */
+    {
+      "id": "q3_natural_yorisoi",
+      "question": "好きな色味は？",
+      "progress": "3 / 4",
+      "choices": [
+        { "label": "はっきり",       "next": "q4_gender_natural_yorisoi_hakkiri" },
+        { "label": "淡い・優しい",   "next": "q4_gender_natural_yorisoi_awai" }
+      ]
+    },
+    {
+      "id": "q4_gender_natural_yorisoi_hakkiri",
+      "question": "フォトグラファーの性別は？",
+      "progress": "4 / 4",
+      "choices": [
+        { "label": "MAN",   "results": ["bessy"] },
+        { "label": "WOMAN", "results": ["Reika"] }
+      ]
+    },
+    {
+      "id": "q4_gender_natural_yorisoi_awai",
+      "question": "フォトグラファーの性別は？",
+      "progress": "4 / 4",
+      "choices": [
+        { "label": "MAN",   "results": ["motti"] },
+        { "label": "WOMAN", "results": ["honoka"] }
       ]
     }
   ],
+
   "photographers": [
-    {
-      "name": "Shiori",
-      "tags": ["woman", "natural", "soft", "indoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto"
-    },
-    {
-      "name": "Kenji",
-      "tags": ["man", "stylish", "contrast", "indoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Rio",
-      "tags": ["woman", "stylish", "outdoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Tatsuki",
-      "tags": ["man", "stylish", "outdoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Konishi",
-      "tags": ["man", "natural", "soft", "outdoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Daisuke",
-      "tags": ["man", "natural", "indoor", "soft"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Bessy",
-      "tags": ["woman", "natural", "outdoor", "soft"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Motti",
-      "tags": ["woman", "natural", "outdoor", "soft"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Uchida / Zacky",
-      "tags": ["man", "stylish", "indoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Taihei",
-      "tags": ["man", "stylish", "indoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Takuya",
-      "tags": ["man", "stylish", "outdoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Iwami",
-      "tags": ["man", "stylish", "outdoor", "contrast"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Reika",
-      "tags": ["woman", "natural", "soft", "indoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Honoka",
-      "tags": ["woman", "natural", "soft", "outdoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    },
-    {
-      "name": "Zacky",
-      "tags": ["man", "stylish", "contrast", "indoor"],
-      "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe"
-    }
+    { "id": "taihei",  "name": "taihei",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "kenji",   "name": "kenji",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "shiori",  "name": "shiori",  "comment": "寄り添いタイプ。二人の雰囲気＋おしゃれな写真を残せる", "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto" },
+    { "id": "tatsuki", "name": "tatsuki", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+    { "id": "takuya",  "name": "takuya",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "iwami",   "name": "iwami",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "Rio",     "name": "Rio",     "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+    { "id": "konishi", "name": "konishi", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "daisuke", "name": "daisuke", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+    { "id": "zacky",   "name": "zacky",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "uchida",  "name": "uchida",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+    { "id": "bessy",   "name": "bessy",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "Reika",   "name": "Reika",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+    { "id": "motti",   "name": "motti",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+    { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" }
   ]
 }
