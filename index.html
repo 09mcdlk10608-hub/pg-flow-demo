@@ -1,3 +1,30 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ラヴィPG 指名フローチャート（デモ）</title>
+  style.css
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>PG指名フローチャート（デモ）</h1>
+      <p class="sub">4つの質問に答えると、おすすめPGを表示します。</p>
+    </header>
+
+    <section id="card" class="card hidden"></section>
+
+    <section id="result" class="hidden">
+      <h2>おすすめのPG</h2>
+      <div id="pgList" class="pg-list"></div>
+      <button id="restart" class="ghost">最初からやり直す</button>
+    </section>
+
+    <footer>
+      <small>※デモ用：作品は公式サイトへリンクします</small>
+    </footer>
+  </main>
 <script>
   const state = { step: "q1", results: null };
 
@@ -97,3 +124,5 @@
 
   run();
 </script>
+</body>
+</html>
