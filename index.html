@@ -4,8 +4,33 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ラヴィPG 指名フローチャート（デモ）</title>
-  style.css
   <meta name="format-detection" content="telephone=no">
+  <style>
+    :root { color-scheme: light dark; --bg:#111; --fg:#fff; --accent:#4B8CFB; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .app { max-width: 760px; margin: 0 auto; padding: 16px; }
+    header { margin: 8px 0 16px; }
+    h1 { font-size: 1.25rem; margin: 0 0 4px; }
+    .sub { color: #888; margin: 0 0 8px; }
+    .card, #result { border: 1px solid #333; border-radius: 12px; padding: 16px; }
+    .hidden { display: none; }
+    h2 { margin: 0 0 8px; font-size: 1.1rem; }
+    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+    .choice, .btn, .ghost {
+      padding: 14px 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #444;
+      background: #222; color: #fff; cursor: pointer;
+    }
+    .choice:hover, .btn:hover { border-color: var(--accent); }
+    .progress { margin-top: 10px; color:#888; text-align: right; }
+    .pg-list { display: grid; gap: 12px; margin-top: 8px; }
+    .pg { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+          border: 1px solid #333; border-radius: 10px; padding: 10px 12px; }
+    .pg h3 { margin: 0 0 2px; font-size: 1rem; }
+    .comment { margin: 6px 0 0; line-height: 1.4; }
+    .btn { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
+    footer { margin-top: 10px; color:#888; text-align: right; }
+  </style>
 </head>
 <body>
   <main class="app">
@@ -28,22 +53,117 @@
   </main>
 
   <script>
-    // ---- 状態管理（“results方式”：分岐が確定したらID配列で結果を表示） ----
+    // ====== ここにデータを内蔵（data.json の代わり）======
+    const DATA = {
+      "nodes": [
+        { "id": "q1", "question": "好きな写真の雰囲気は？", "progress": "1 / 4",
+          "choices": [
+            { "label": "スタイリッシュ", "next": "q2_stylish" },
+            { "label": "ナチュラル",     "next": "q2_natural" }
+          ]
+        },
+
+        { "id": "q2_stylish", "question": "どんな人に撮ってもらいたい？", "progress": "2 / 4",
+          "choices": [
+            { "label": "楽しい",  "next": "q3_stylish_fun" },
+            { "label": "寄り添い","next": "q3_stylish_yorisoi" }
+          ]
+        },
+        { "id": "q2_natural", "question": "どんな人に撮ってもらいたい？", "progress": "2 / 4",
+          "choices": [
+            { "label": "楽しい",  "next": "q3_natural_fun" },
+            { "label": "寄り添い","next": "q3_natural_yorisoi" }
+          ]
+        },
+
+        // スタイリッシュ × 楽しい
+        { "id": "q3_stylish_fun", "question": "好きな色味は？", "progress": "3 / 4",
+          "choices": [
+            { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_fun" },
+            { "label": "上品で洗練されている",     "results": ["tatsuki"] }
+          ]
+        },
+        { "id": "q4_gender_stylish_fun", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
+          "choices": [
+            { "label": "MAN",   "results": ["taihei", "kenji"] },
+            { "label": "WOMAN", "results": ["shiori"] }
+          ]
+        },
+
+        // スタイリッシュ × 寄り添い
+        { "id": "q3_stylish_yorisoi", "question": "好きな色味は？", "progress": "3 / 4",
+          "choices": [
+            { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_yorisoi" },
+            { "label": "上品で洗練されている",     "results": ["Rio"] }
+          ]
+        },
+        { "id": "q4_gender_stylish_yorisoi", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
+          "choices": [
+            { "label": "MAN",   "results": ["takuya"] },
+            { "label": "WOMAN", "results": ["iwami"] }
+          ]
+        },
+
+        // ナチュラル × 楽しい
+        { "id": "q3_natural_fun", "question": "好きな色味は？", "progress": "3 / 4",
+          "choices": [
+            { "label": "はっきり",       "results": ["konishi", "daisuke"] },
+            { "label": "淡い・優しい",   "results": ["zacky", "uchida"] }
+          ]
+        },
+
+        // ナチュラル × 寄り添い
+        { "id": "q3_natural_yorisoi", "question": "好きな色味は？", "progress": "3 / 4",
+          "choices": [
+            { "label": "はっきり",       "next": "q4_gender_natural_yorisoi_hakkiri" },
+            { "label": "淡い・優しい",   "next": "q4_gender_natural_yorisoi_awai" }
+          ]
+        },
+        { "id": "q4_gender_natural_yorisoi_hakkiri", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
+          "choices": [
+            { "label": "MAN",   "results": ["bessy"] },
+            { "label": "WOMAN", "results": ["Reika"] }
+          ]
+        },
+        { "id": "q4_gender_natural_yorisoi_awai", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
+          "choices": [
+            { "label": "MAN",   "results": ["motti"] },
+            { "label": "WOMAN", "results": ["honoka"] }
+          ]
+        }
+      ],
+      "photographers": [
+        { "id": "taihei",  "name": "taihei",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "kenji",   "name": "kenji",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "shiori",  "name": "shiori",  "comment": "寄り添いタイプ。二人の雰囲気＋おしゃれな写真を残せる", "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto" },
+        { "id": "tatsuki", "name": "tatsuki", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+        { "id": "takuya",  "name": "takuya",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "iwami",   "name": "iwami",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "Rio",     "name": "Rio",     "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+        { "id": "konishi", "name": "konishi", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "daisuke", "name": "daisuke", "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+        { "id": "zacky",   "name": "zacky",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "uchida",  "name": "uchida",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+        { "id": "bessy",   "name": "bessy",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "Reika",   "name": "Reika",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+
+        { "id": "motti",   "name": "motti",   "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" },
+        { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "https://www.la-viephoto.com/photo_g/kobe" }
+      ]
+    };
+    // ====== 内蔵データここまで ======
+
     const state = { step: "q1", results: null };
 
-    // GitHub Pagesのキャッシュが強いので、都度クエリを付けて取得
-    async function loadData() {
-      const res = await fetch('data.json?_=' + Date.now());
-      if (!res.ok) throw new Error("data.json を読み込めませんでした");
-      return await res.json();
+    function findNode(id) {
+      return DATA.nodes.find(n => n.id === id);
     }
-
-    function findNode(data, id) {
-      return data.nodes.find(n => n.id === id);
-    }
-
-    function resolvePhotographers(data, ids) {
-      const map = new Map(data.photographers.map(p => [p.id, p]));
+    function resolvePhotographers(ids) {
+      const map = new Map(DATA.photographers.map(p => [p.id, p]));
       return ids.map(id => map.get(id)).filter(Boolean);
     }
 
@@ -64,34 +184,26 @@
       `;
       el.classList.remove('hidden');
 
-      // ボタンクリックで次へ
       document.querySelectorAll('.choice').forEach(btn => {
         btn.onclick = (e) => {
-          const target = e.currentTarget;
-          const resultsStr = target.getAttribute('data-results');
-
+          const t = e.currentTarget;
+          const resultsStr = t.getAttribute('data-results');
           if (resultsStr) {
-            // ここで最終結果が確定
-            try {
-              state.results = JSON.parse(resultsStr);
-            } catch {
-              state.results = [];
-            }
+            try { state.results = JSON.parse(resultsStr); } catch { state.results = []; }
             state.step = "FINAL";
             run();
             return;
           }
-
-          const next = target.getAttribute('data-next');
+          const next = t.getAttribute('data-next');
           state.step = next || "FINAL";
           run();
         };
       });
     }
 
-    function renderResult(data) {
+    function renderResult() {
       const ids = Array.isArray(state.results) ? state.results : [];
-      const list = ids.length ? resolvePhotographers(data, ids) : [];
+      const list = resolvePhotographers(ids);
 
       const wrap = document.getElementById('pgList');
       wrap.innerHTML = list.map(p => `
@@ -103,8 +215,7 @@
           ${p.portfolio_url ? `
             ${p.portfolio_url}
               作品を見る
-            </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`
-          }
+            </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`}
         </article>
       `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
 
@@ -120,24 +231,11 @@
       };
     }
 
-    async function run() {
-      try {
-        const data = await loadData();
-
-        if (state.step === "FINAL") {
-          return renderResult(data);
-        }
-
-        const node = findNode(data, state.step);
-        if (!node) {
-          state.step = "FINAL";
-          return renderResult(data);
-        }
-        renderQuestion(node);
-      } catch (e) {
-        console.error(e);
-        alert("データの読み込みに失敗しました。少し時間をおいて再読み込みしてください。");
-      }
+    function run() {
+      if (state.step === "FINAL") return renderResult();
+      const node = findNode(state.step);
+      if (!node) { state.step = "FINAL"; return renderResult(); }
+      renderQuestion(node);
     }
 
     run();
