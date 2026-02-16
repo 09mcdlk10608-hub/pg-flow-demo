@@ -1,112 +1,99 @@
-<!doctype html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ラヴィPG 指名フローチャート（デモ）</title>
-  style.css
-</head>
-<body>
-  <main class="app">
-    <header>
-      <h1>PG指名フローチャート（デモ）</h1>
-      <p class="sub">4つの質問に答えると、おすすめPGを表示します。</p>
-    </header>
+<script>
+  const state = { step: "q1", results: null };
 
-    <section id="card" class="card hidden"></section>
+  async function loadData() {
+    const res = await fetch('data.json?_=' + Date.now()); // キャッシュ回避
+    return await res.json();
+  }
 
-    <section id="result" class="hidden">
-      <h2>おすすめのPG</h2>
-      <div id="pgList" class="pg-list"></div>
-      <button id="restart" class="ghost">最初からやり直す</button>
-    </section>
+  function findNode(data, id) {
+    return data.nodes.find(n => n.id === id);
+  }
 
-    <footer>
-      <small>※デモ用：作品は公式サイトへリンクします</small>
-    </footer>
-  </main>
+  function resolvePhotographers(data, ids) {
+    const map = Object.fromEntries(data.photographers.map(p => [p.id, p]));
+    return ids.map(id => map[id]).filter(Boolean);
+  }
 
-  <script>
-    // 軽量バニラJS。data.json を読み込んで決定木を進行。
-    const state = { tags: [], step: "q1" };
+  function renderQuestion(node) {
+    const el = document.getElementById('card');
+    el.innerHTML = `
+      <h2>${node.question}</h2>
+      <div class="choices">
+        ${node.choices.map(c => `
+          <button class="choice"
+                  data-next='${c.next || ""}'
+                  data-results='${c.results ? JSON.stringify(c.results) : ""}'>
+            ${c.label}
+          </button>
+        `).join('')}
+      </div>
+      <div class="progress">${node.progress || ""}</div>
+    `;
+    el.classList.remove('hidden');
 
-    async function loadData() {
-      const res = await fetch('data.json');
-      return await res.json();
-    }
-
-    function renderQuestion(node) {
-      const el = document.getElementById('card');
-      el.innerHTML = `
-        <h2>${node.question}</h2>
-        <div class="choices">
-          ${node.choices.map((c,i)=>`
-            <button class="choice" data-next="${c.next}" data-tags='${JSON.stringify(c.add_tags||[])}'>
-              ${c.label}
-            </button>`).join('')}
-        </div>
-        <div class="progress">${node.progress||""}</div>
-      `;
-      el.classList.remove('hidden');
-
-      document.querySelectorAll('.choice').forEach(btn=>{
-        btn.onclick = (e)=>{
-          const tags = JSON.parse(e.currentTarget.getAttribute('data-tags'));
-          state.tags.push(...tags);
-          const next = e.currentTarget.getAttribute('data-next');
-          state.step = next;
+    document.querySelectorAll('.choice').forEach(btn => {
+      btn.onclick = (e) => {
+        const resultsStr = e.currentTarget.getAttribute('data-results');
+        if (resultsStr) {
+          state.results = JSON.parse(resultsStr);
+          state.step = "FINAL";
           run();
-        };
-      });
-    }
-
-    function scorePhotographers(data) {
-      // シンプル加点：タグ一致数でスコア（同点は表示順）
-      const userTags = new Set(state.tags);
-      return data.photographers.map(p=>{
-        const match = p.tags.filter(t=>userTags.has(t));
-        return {...p, score: match.length};
-      }).sort((a,b)=>b.score-a.score);
-    }
-
-    function renderResult(data) {
-      const ranked = scorePhotographers(data);
-      const top = ranked.filter(p=>p.score>0).slice(0,3); // 上位3名
-      const target = top.length>0 ? top : ranked.slice(0,3); // 全く一致なし→人気順
-
-      const wrap = document.getElementById('pgList');
-      wrap.innerHTML = target.map(p=>`
-        <article class="pg">
-          <div class="pg-meta">
-            <h3>${p.name}</h3>
-            <p class="tags">${p.tags.join(' / ')}</p>
-          </div>
-          ${p.portfolio_url}作品を見る</a>
-        </article>
-      `).join('');
-
-      document.getElementById('card').classList.add('hidden');
-      const r = document.getElementById('result');
-      r.classList.remove('hidden');
-
-      document.getElementById('restart').onclick = ()=>{
-        state.tags = [];
-        state.step = "q1";
-        document.getElementById('result').classList.add('hidden');
+          return;
+        }
+        const next = e.currentTarget.getAttribute('data-next');
+        state.step = next || "FINAL";
         run();
       };
+    });
+  }
+
+  function renderResult(data) {
+    // 明示的な results がある場合はそれを使う
+    const ids = state.results && state.results.length ? state.results : [];
+    const list = ids.length ? resolvePhotographers(data, ids) : [];
+
+    const wrap = document.getElementById('pgList');
+    wrap.innerHTML = list.map(p => `
+      <article class="pg">
+        <div class="pg-meta">
+          <h3>${p.name}</h3>
+          ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
+        </div>
+        ${p.portfolio_url ? `
+          ${p.portfolio_url}
+            作品を見る
+          </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`
+        }
+      </article>
+    `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
+
+    document.getElementById('card').classList.add('hidden');
+    const r = document.getElementById('result');
+    r.classList.remove('hidden');
+
+    document.getElementById('restart').onclick = () => {
+      state.step = "q1";
+      state.results = null;
+      document.getElementById('result').classList.add('hidden');
+      run();
+    };
+  }
+
+  async function run() {
+    const data = await loadData();
+
+    if (state.step === "FINAL") {
+      return renderResult(data);
     }
 
-    async function run() {
-      const data = await loadData();
-      if (state.step === "FINAL") return renderResult(data);
-
-      const node = data.nodes.find(n=>n.id===state.step);
-      if (!node) return renderResult(data);
-      renderQuestion(node);
+    const node = findNode(data, state.step);
+    if (!node) {
+      state.step = "FINAL";
+      return renderResult(data);
     }
+    renderQuestion(node);
+  }
 
-    run();
-  </script>
-</body>
-</html>
+  run();
+</script>
