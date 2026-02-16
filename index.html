@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>ラヴィPG 指名フローチャート（デモ）</title>
   style.css
+  <meta name="format-detection" content="telephone=no">
 </head>
 <body>
   <main class="app">
@@ -22,107 +23,124 @@
     </section>
 
     <footer>
-      <small>※デモ用：作品は公式サイトへリンクします</small>
+      <small>※デモ用：結果画面から公式サイトの作品ページにリンクします</small>
     </footer>
   </main>
-<script>
-  const state = { step: "q1", results: null };
 
-  async function loadData() {
-    const res = await fetch('data.json?_=' + Date.now()); // キャッシュ回避
-    return await res.json();
-  }
+  <script>
+    // ---- 状態管理（“results方式”：分岐が確定したらID配列で結果を表示） ----
+    const state = { step: "q1", results: null };
 
-  function findNode(data, id) {
-    return data.nodes.find(n => n.id === id);
-  }
+    // GitHub Pagesのキャッシュが強いので、都度クエリを付けて取得
+    async function loadData() {
+      const res = await fetch('data.json?_=' + Date.now());
+      if (!res.ok) throw new Error("data.json を読み込めませんでした");
+      return await res.json();
+    }
 
-  function resolvePhotographers(data, ids) {
-    const map = Object.fromEntries(data.photographers.map(p => [p.id, p]));
-    return ids.map(id => map[id]).filter(Boolean);
-  }
+    function findNode(data, id) {
+      return data.nodes.find(n => n.id === id);
+    }
 
-  function renderQuestion(node) {
-    const el = document.getElementById('card');
-    el.innerHTML = `
-      <h2>${node.question}</h2>
-      <div class="choices">
-        ${node.choices.map(c => `
-          <button class="choice"
-                  data-next='${c.next || ""}'
-                  data-results='${c.results ? JSON.stringify(c.results) : ""}'>
-            ${c.label}
-          </button>
-        `).join('')}
-      </div>
-      <div class="progress">${node.progress || ""}</div>
-    `;
-    el.classList.remove('hidden');
+    function resolvePhotographers(data, ids) {
+      const map = new Map(data.photographers.map(p => [p.id, p]));
+      return ids.map(id => map.get(id)).filter(Boolean);
+    }
 
-    document.querySelectorAll('.choice').forEach(btn => {
-      btn.onclick = (e) => {
-        const resultsStr = e.currentTarget.getAttribute('data-results');
-        if (resultsStr) {
-          state.results = JSON.parse(resultsStr);
-          state.step = "FINAL";
+    function renderQuestion(node) {
+      const el = document.getElementById('card');
+      el.innerHTML = `
+        <h2>${node.question}</h2>
+        <div class="choices">
+          ${node.choices.map(c => `
+            <button class="choice"
+              data-next='${c.next || ""}'
+              data-results='${c.results ? JSON.stringify(c.results) : ""}'>
+              ${c.label}
+            </button>
+          `).join('')}
+        </div>
+        <div class="progress">${node.progress || ""}</div>
+      `;
+      el.classList.remove('hidden');
+
+      // ボタンクリックで次へ
+      document.querySelectorAll('.choice').forEach(btn => {
+        btn.onclick = (e) => {
+          const target = e.currentTarget;
+          const resultsStr = target.getAttribute('data-results');
+
+          if (resultsStr) {
+            // ここで最終結果が確定
+            try {
+              state.results = JSON.parse(resultsStr);
+            } catch {
+              state.results = [];
+            }
+            state.step = "FINAL";
+            run();
+            return;
+          }
+
+          const next = target.getAttribute('data-next');
+          state.step = next || "FINAL";
           run();
-          return;
-        }
-        const next = e.currentTarget.getAttribute('data-next');
-        state.step = next || "FINAL";
+        };
+      });
+    }
+
+    function renderResult(data) {
+      const ids = Array.isArray(state.results) ? state.results : [];
+      const list = ids.length ? resolvePhotographers(data, ids) : [];
+
+      const wrap = document.getElementById('pgList');
+      wrap.innerHTML = list.map(p => `
+        <article class="pg">
+          <div class="pg-meta">
+            <h3>${p.name}</h3>
+            ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
+          </div>
+          ${p.portfolio_url ? `
+            ${p.portfolio_url}
+              作品を見る
+            </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`
+          }
+        </article>
+      `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
+
+      document.getElementById('card').classList.add('hidden');
+      const r = document.getElementById('result');
+      r.classList.remove('hidden');
+
+      document.getElementById('restart').onclick = () => {
+        state.step = "q1";
+        state.results = null;
+        document.getElementById('result').classList.add('hidden');
         run();
       };
-    });
-  }
+    }
 
-  function renderResult(data) {
-    // 明示的な results がある場合はそれを使う
-    const ids = state.results && state.results.length ? state.results : [];
-    const list = ids.length ? resolvePhotographers(data, ids) : [];
+    async function run() {
+      try {
+        const data = await loadData();
 
-    const wrap = document.getElementById('pgList');
-    wrap.innerHTML = list.map(p => `
-      <article class="pg">
-        <div class="pg-meta">
-          <h3>${p.name}</h3>
-          ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
-        </div>
-        ${p.portfolio_url ? `
-          ${p.portfolio_url}
-            作品を見る
-          </a>` : `<span class="btn disabled" title="URL未設定">作品リンク準備中</span>`
+        if (state.step === "FINAL") {
+          return renderResult(data);
         }
-      </article>
-    `).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
 
-    document.getElementById('card').classList.add('hidden');
-    const r = document.getElementById('result');
-    r.classList.remove('hidden');
-
-    document.getElementById('restart').onclick = () => {
-      state.step = "q1";
-      state.results = null;
-      document.getElementById('result').classList.add('hidden');
-      run();
-    };
-  }
-
-  async function run() {
-    const data = await loadData();
-
-    if (state.step === "FINAL") {
-      return renderResult(data);
+        const node = findNode(data, state.step);
+        if (!node) {
+          state.step = "FINAL";
+          return renderResult(data);
+        }
+        renderQuestion(node);
+      } catch (e) {
+        console.error(e);
+        alert("データの読み込みに失敗しました。少し時間をおいて再読み込みしてください。");
+      }
     }
 
-    const node = findNode(data, state.step);
-    if (!node) {
-      state.step = "FINAL";
-      return renderResult(data);
-    }
-    renderQuestion(node);
-  }
-
-  run();
-</script>
+    run();
+  </script>
 </body>
 </html>
