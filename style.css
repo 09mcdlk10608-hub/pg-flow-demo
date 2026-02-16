@@ -1,0 +1,24 @@
+:root { color-scheme: light dark; --bg:#111; --fg:#fff; --accent:#4B8CFB; }
+* { box-sizing: border-box; }
+body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+.app { max-width: 760px; margin: 0 auto; padding: 16px; }
+header { margin: 8px 0 16px; }
+h1 { font-size: 1.25rem; margin: 0 0 4px; }
+.sub { color: #888; margin: 0 0 8px; }
+.card, #result { border: 1px solid #333; border-radius: 12px; padding: 16px; }
+.hidden { display: none; }
+h2 { margin: 0 0 8px; font-size: 1.1rem; }
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
+.choice, .btn, .ghost {
+  padding: 14px 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #444;
+  background: #222; color: #fff; cursor: pointer;
+}
+.choice:hover, .btn:hover { border-color: var(--accent); }
+.progress { margin-top: 10px; color:#888; text-align: right; }
+.pg-list { display: grid; gap: 12px; margin-top: 8px; }
+.pg { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      border: 1px solid #333; border-radius: 10px; padding: 10px 12px; }
+.pg h3 { margin: 0 0 2px; font-size: 1rem; }
+.pg .tags { margin: 0; color:#aaa; font-size: .85rem; }
+.btn { background: var(--accent); border-color: var(--accent); color: #fff; text-decoration: none; }
+footer { margin-top: 10px; color:#888; text-align: right; }
