@@ -3,66 +3,58 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ラヴィPG 指名フローチャート（デモ）</title>
+  <title>ラヴィPG 指名フローチャート（デモ／セーフモード）</title>
   <meta name="format-detection" content="telephone=no">
   <style>
-    :root { color-scheme: light dark; --bg:#111; --fg:#fff; --accent:#4B8CFB; }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body { margin:0; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; background:#000; color:#fff; }
-    .app { max-width: 760px; margin: 0 auto; padding: 16px; position: relative; z-index: 0; }
-    header { margin: 8px 0 16px; }
-    h1 { font-size: 1.25rem; margin: 0 0 4px; }
-    .sub { color: #bbb; margin: 0 0 8px; }
-    .card, #result { border: 1px solid #333; border-radius: 12px; padding: 16px; background:#111; position: relative; z-index: 1; }
-    .hidden { display: none !important; }
-    h2 { margin: 0 0 8px; font-size: 1.1rem; }
-    .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 8px; }
-    .choice {
-      padding: 14px 12px; font-size: 1rem; border-radius: 10px; border: 1px solid #444;
-      background: #222; color: #fff; cursor: pointer; text-align: center;
+    /* ---- セーフモード：白背景＋最小構成（クリック阻害要素ゼロ） ---- */
+    html, body { margin:0; padding:0; background:#fff; color:#222; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+    .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
+    h1 { font-size: 20px; margin: 0 0 6px; }
+    .sub { color:#666; margin: 0 0 12px; font-size: 14px; }
+    .card, #result { border: 1px solid #ccc; border-radius: 10px; padding: 14px; background:#fff; }
+    .hidden { display:none; }
+    h2 { margin: 0 0 10px; font-size: 18px; }
+    .choices { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin: 6px 0; }
+    button.choice, .btn, .ghost {
+      -webkit-tap-highlight-color: transparent;
+      padding: 14px 12px; font-size: 16px; border-radius: 10px; border: 1px solid #bbb; background:#f5f5f5; cursor:pointer; text-align:center;
     }
-    .choice:hover { border-color: var(--accent); }
-    .progress { margin-top: 10px; color:#888; text-align: right; }
-    .pg-list { display: grid; gap: 12px; margin-top: 8px; position: relative; z-index: 2; }
-    .pg { display: flex; align-items: center; justify-content: space-between; gap: 12px;
-          border: 1px solid #333; border-radius: 10px; padding: 10px 12px; background:#111; position: relative; }
-    .pg h3 { margin: 0 0 2px; font-size: 1rem; }
-    .comment { margin: 6px 0 0; line-height: 1.4; color:#ddd; }
-    .btn {
-      padding: 14px 12px; font-size: 1rem; border-radius: 10px; border: 1px solid var(--accent);
-      background: var(--accent); color: #fff; text-decoration: none; display: inline-block; text-align:center;
-      position: relative; z-index: 10; pointer-events: auto; -webkit-tap-highlight-color: rgba(0,0,0,0);
-    }
-    .btn:active { transform: translateY(1px); }
-    .ghost { padding: 12px 10px; background:#222; border:1px solid #444; color:#fff; border-radius:10px; cursor:pointer; }
-    footer { margin-top: 10px; color:#888; text-align: right; position: relative; z-index: 1; }
+    button.choice:active, .btn:active { transform: translateY(1px); }
+    .progress { text-align:right; color:#888; font-size:12px; margin-top: 6px; }
+    .pg-list { display:grid; gap:10px; margin-top: 8px; }
+    .pg { display:flex; align-items:center; justify-content:space-between; gap:10px; border:1px solid #ddd; border-radius:10px; padding:10px 12px; background:#fff; }
+    .pg h3 { margin:0 0 4px; font-size:16px; }
+    .comment { margin:0; color:#444; font-size:14px; }
+    .btn { background:#2b6be4; color:#fff; border-color:#2b6be4; text-decoration:none; display:inline-block; }
+    .url-line { margin-top:6px; font-size: 12px; }
+    .url-line a { color:#2b6be4; word-break: break-all; }
+    .ghost { background:#fff; border-color:#bbb; color:#333; margin-top:8px; }
+    footer { color:#888; text-align:right; font-size:12px; margin-top:10px; }
   </style>
 </head>
 <body>
-  <main class="app">
+  <div class="wrap">
     <header>
-      <h1>PG指名フローチャート（デモ）</h1>
+      <h1>PG指名フローチャート（デモ／セーフモード）</h1>
       <p class="sub">4つの質問に答えると、おすすめPGを表示します。</p>
     </header>
 
-    <section id="card" class="card hidden"></section>
+    <section id="card" class="card"><!-- JSで上書き --></section>
 
     <section id="result" class="hidden">
       <h2>おすすめのPG</h2>
       <div id="pgList" class="pg-list"></div>
-      <button id="restart" class="ghost">最初からやり直す</button>
+      <button id="restart" class="ghost" type="button">最初からやり直す</button>
     </section>
 
     <footer>
-      <small>※デモ用：結果画面から公式サイトの作品ページにリンクします</small>
+      <small>※デモ用：結果画面から公式サイトの作品ページへ遷移します</small>
     </footer>
-  </main>
+  </div>
 
   <script>
-    // ====== 設定 ======
+    // ====== 設定：デフォルト遷移先（神戸一覧） ======
     const DEFAULT_PORTFOLIO_URL = "https://www.la-viephoto.com/photo_g/kobe";
-    const DEBUG = false; // trueにするとクリック時にURLをalert表示
 
     // ====== データ（内蔵）======
     const DATA = {
@@ -166,13 +158,11 @@
         { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" }
       ]
     };
-    // ====== データここまで ======
 
+    // ====== ロジック：results方式（最小実装） ======
     const state = { step: "q1", results: null };
 
-    function findNode(id) {
-      return DATA.nodes.find(n => n.id === id);
-    }
+    function findNode(id) { return DATA.nodes.find(n => n.id === id); }
     function resolvePhotographers(ids) {
       const map = new Map(DATA.photographers.map(p => [p.id, p]));
       return ids.map(id => map.get(id)).filter(Boolean);
@@ -180,6 +170,9 @@
 
     function renderQuestion(node) {
       const el = document.getElementById('card');
+      el.classList.remove('hidden');
+      document.getElementById('result').classList.add('hidden');
+
       el.innerHTML = `
         <h2>${node.question}</h2>
         <div class="choices">
@@ -193,61 +186,70 @@
         </div>
         <div class="progress">${node.progress || ""}</div>
       `;
-      el.classList.remove('hidden');
 
-      document.querySelectorAll('.choice').forEach(btn => {
-        btn.onclick = (e) => {
+      el.querySelectorAll('.choice').forEach(btn => {
+        btn.addEventListener('click', (e) => {
           const t = e.currentTarget;
           const resultsStr = t.getAttribute('data-results');
           if (resultsStr) {
             try { state.results = JSON.parse(resultsStr); } catch { state.results = []; }
-            state.step = "FINAL";
-            run();
-            return;
+            state.step = "FINAL"; run(); return;
           }
           const next = t.getAttribute('data-next');
-          state.step = next || "FINAL";
-          run();
-        };
+          state.step = next || "FINAL"; run();
+        });
       });
     }
 
     function renderResult() {
       const ids = Array.isArray(state.results) ? state.results : [];
       const list = resolvePhotographers(ids);
-
       const wrap = document.getElementById('pgList');
+
       wrap.innerHTML = list.map(p => {
         const url = (p.portfolio_url && p.portfolio_url.trim()) || DEFAULT_PORTFOLIO_URL;
-        const safeUrl = String(url);
-        // アンカー（素直な遷移）＋ onclick フォールバック（同一タブ遷移）
         return `
           <article class="pg">
-            <div class="pg-meta">
+            <div>
               <h3>${p.name}</h3>
               ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
             </div>
-            <a class="btn" href="${safeUrl}" target="_self" rel="noreferrer"
-               data-href="${safeUrl}" onclick="(function(el){
-                 try {
-                   var u = el.getAttribute('data-href') || el.href;
-                   ${DEBUG ? "alert('遷移先: ' + u);" : ""}
-                   // iOSの一部ケース対策：明示的に同一タブで遷移
-                   window.location.assign(u);
-                 } catch (e) { /* 何もしない（アンカーの既定ult').classList.add('hidden');
+            <div style="text-align:right; min-width:160px;">
+              ${url}作品を見る</button>
+              <div class="url-line"><a href="${}</a></div>
+            </div>
+          </article>
+        `;
+      }).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
+
+      document.getElementById('card').classList.add('hidden');
+      const r = document.getElementById('result');
+      r.classList.remove('hidden');
+
+      // 100%遷移させる：同一タブで明示遷移
+      r.querySelectorAll('.open-link').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const href = e.currentTarget.getAttribute('data-href');
+          if (href) window.location.href = href;  // ← 同一タブで必ず遷移
+        });
+      });
+
+      document.getElementById('restart').onclick = () => {
+        state.step = "q1";
+        state.results = null;
         run();
       };
     }
 
     function run() {
-      if (state.step === "FINAL") return renderResult();
+      if (state.step === "FINAL") { renderResult(); return; }
       const node = findNode(state.step);
-      if (!node) { state.step = "FINAL"; return renderResult(); }
+      if (!node) { state.step = "FINAL"; renderResult(); return; }
       renderQuestion(node);
     }
 
+    // 初期描画
     run();
   </script>
 </body>
 </html>
-``
