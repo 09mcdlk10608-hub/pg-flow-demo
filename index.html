@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>ラヴィPG 指名フローチャート（デモ／セーフモード）</title>
+  <title>ラヴィPG 指名フローチャート（デモ／超互換）</title>
   <meta name="format-detection" content="telephone=no">
   <style>
-    /* ---- セーフモード：白背景＋最小構成（クリック阻害要素ゼロ） ---- */
+    /* ---- 白背景＋最小CSS。クリック阻害要素なし ---- */
     html, body { margin:0; padding:0; background:#fff; color:#222; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
     .wrap { max-width: 760px; margin: 0 auto; padding: 16px; }
     h1 { font-size: 20px; margin: 0 0 6px; }
@@ -35,11 +35,11 @@
 <body>
   <div class="wrap">
     <header>
-      <h1>PG指名フローチャート（デモ／セーフモード）</h1>
+      <h1>PG指名フローチャート（デモ／超互換）</h1>
       <p class="sub">4つの質問に答えると、おすすめPGを表示します。</p>
     </header>
 
-    <section id="card" class="card"><!-- JSで上書き --></section>
+    <section id="card" class="card"><!-- JS で上書き --></section>
 
     <section id="result" class="hidden">
       <h2>おすすめのPG</h2>
@@ -53,11 +53,11 @@
   </div>
 
   <script>
-    // ====== 設定：デフォルト遷移先（神戸一覧） ======
-    const DEFAULT_PORTFOLIO_URL = "https://www.la-viephoto.com/photo_g/kobe";
+    /* ====== 設定 ====== */
+    var DEFAULT_PORTFOLIO_URL = "https://www.la-viephoto.com/photo_g/kobe";
 
-    // ====== データ（内蔵）======
-    const DATA = {
+    /* ====== データ（内蔵）====== */
+    var DATA = {
       "nodes": [
         { "id": "q1", "question": "好きな写真の雰囲気は？", "progress": "1 / 4",
           "choices": [
@@ -65,7 +65,6 @@
             { "label": "ナチュラル",     "next": "q2_natural" }
           ]
         },
-
         { "id": "q2_stylish", "question": "どんな人に撮ってもらいたい？", "progress": "2 / 4",
           "choices": [
             { "label": "楽しい",  "next": "q3_stylish_fun" },
@@ -78,12 +77,10 @@
             { "label": "寄り添い","next": "q3_natural_yorisoi" }
           ]
         },
-
-        // スタイリッシュ × 楽しい
         { "id": "q3_stylish_fun", "question": "好きな色味は？", "progress": "3 / 4",
           "choices": [
-            { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_fun" },
-            { "label": "上品で洗練されている",     "results": ["tatsuki"] }
+            { "label": "オシャレ＆かっこいい", "next": "q4_gender_stylish_fun" },
+            { "label": "上品で洗練されている", "results": ["tatsuki"] }
           ]
         },
         { "id": "q4_gender_stylish_fun", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
@@ -92,12 +89,10 @@
             { "label": "WOMAN", "results": ["shiori"] }
           ]
         },
-
-        // スタイリッシュ × 寄り添い
         { "id": "q3_stylish_yorisoi", "question": "好きな色味は？", "progress": "3 / 4",
           "choices": [
-            { "label": "オシャレ＆かっこいい",     "next": "q4_gender_stylish_yorisoi" },
-            { "label": "上品で洗練されている",     "results": ["Rio"] }
+            { "label": "オシャレ＆かっこいい", "next": "q4_gender_stylish_yorisoi" },
+            { "label": "上品で洗練されている", "results": ["Rio"] }
           ]
         },
         { "id": "q4_gender_stylish_yorisoi", "question": "フォトグラファーの性別は？", "progress": "4 / 4",
@@ -106,16 +101,12 @@
             { "label": "WOMAN", "results": ["iwami"] }
           ]
         },
-
-        // ナチュラル × 楽しい
         { "id": "q3_natural_fun", "question": "好きな色味は？", "progress": "3 / 4",
           "choices": [
             { "label": "はっきり",       "results": ["konishi", "daisuke"] },
             { "label": "淡い・優しい",   "results": ["zacky", "uchida"] }
           ]
         },
-
-        // ナチュラル × 寄り添い
         { "id": "q3_natural_yorisoi", "question": "好きな色味は？", "progress": "3 / 4",
           "choices": [
             { "label": "はっきり",       "next": "q4_gender_natural_yorisoi_hakkiri" },
@@ -140,101 +131,111 @@
         { "id": "kenji",   "name": "kenji",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "shiori",  "name": "shiori",  "comment": "寄り添いタイプ。二人の雰囲気＋おしゃれな写真を残せる", "portfolio_url": "https://www.la-viephoto.com/photo_g/shiori-sugimoto" },
         { "id": "tatsuki", "name": "tatsuki", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
-
         { "id": "takuya",  "name": "takuya",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "iwami",   "name": "iwami",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "Rio",     "name": "Rio",     "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
-
         { "id": "konishi", "name": "konishi", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "daisuke", "name": "daisuke", "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
-
         { "id": "zacky",   "name": "zacky",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "uchida",  "name": "uchida",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
-
         { "id": "bessy",   "name": "bessy",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "Reika",   "name": "Reika",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
-
         { "id": "motti",   "name": "motti",   "comment": "※店舗コメントをここに入力", "portfolio_url": "" },
         { "id": "honoka",  "name": "honoka",  "comment": "※店舗コメントをここに入力", "portfolio_url": "" }
       ]
     };
 
-    // ====== ロジック：results方式（最小実装） ======
-    const state = { step: "q1", results: null };
+    /* ====== ロジック（ES5） ====== */
+    var state = { step: "q1", results: null };
 
-    function findNode(id) { return DATA.nodes.find(n => n.id === id); }
-    function resolvePhotographers(ids) {
-      const map = new Map(DATA.photographers.map(p => [p.id, p]));
-      return ids.map(id => map.get(id)).filter(Boolean);
+    function findNode(id) {
+      for (var i=0;i<DATA.nodes.length;i++) {
+        if (DATA.nodes[i].id === id) return DATA.nodes[i];
+      }
+      return null;
     }
 
+    function resolvePhotographers(ids) {
+      var list = [];
+      for (var i=0;i<ids.length;i++) {
+        var id = ids[i], j;
+        for (j=0;j<DATA.photographers.length;j++) {
+          if (DATA.photographers[j].id === id) { list.push(DATA.photographers[j]); break; }
+        }
+      }
+      return list;
+    }
+
+    function esc(s){ return String(s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    }); }
+
     function renderQuestion(node) {
-      const el = document.getElementById('card');
-      el.classList.remove('hidden');
-      document.getElementById('result').classList.add('hidden');
+      var html = "";
+      html += "<h2>"+esc(node.question)+"</h2>";
+      html += '<div class="choices">';
+      for (var i=0;i<node.choices.length;i++) {
+        var c = node.choices[i];
+        html += '<button class="choice" data-next="'+(c.next?esc(c.next):"")+'" data-results="'+(c.results?esc(JSON.stringify(c.results)):"")+'">'+esc(c.label)+'</button>';
+      }
+      html += '</div>';
+      html += '<div class="progress">'+(node.progress?esc(node.progress):"")+'</div>';
 
-      el.innerHTML = `
-        <h2>${node.question}</h2>
-        <div class="choices">
-          ${node.choices.map(c => `
-            <button class="choice"
-              data-next='${c.next || ""}'
-              data-results='${c.results ? JSON.stringify(c.results) : ""}'>
-              ${c.label}
-            </button>
-          `).join('')}
-        </div>
-        <div class="progress">${node.progress || ""}</div>
-      `;
+      var el = document.getElementById('card');
+      el.innerHTML = html;
+      el.className = "card"; // ensure visible
+      document.getElementById('result').className = "hidden";
 
-      el.querySelectorAll('.choice').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const t = e.currentTarget;
-          const resultsStr = t.getAttribute('data-results');
+      var btns = el.getElementsByClassName('choice');
+      for (var k=0;k<btns.length;k++) {
+        btns[k].addEventListener('click', function(e){
+          var resultsStr = this.getAttribute('data-results');
           if (resultsStr) {
-            try { state.results = JSON.parse(resultsStr); } catch { state.results = []; }
+            try { state.results = JSON.parse(resultsStr); } catch (e) { state.results = []; }
             state.step = "FINAL"; run(); return;
           }
-          const next = t.getAttribute('data-next');
-          state.step = next || "FINAL"; run();
+          var next = this.getAttribute('data-next');
+          state.step = next || "FINAL";
+          run();
         });
-      });
+      }
     }
 
     function renderResult() {
-      const ids = Array.isArray(state.results) ? state.results : [];
-      const list = resolvePhotographers(ids);
-      const wrap = document.getElementById('pgList');
+      var ids = (state.results && state.results.length) ? state.results : [];
+      var list = resolvePhotographers(ids);
+      var wrap = document.getElementById('pgList');
+      var html = "";
 
-      wrap.innerHTML = list.map(p => {
-        const url = (p.portfolio_url && p.portfolio_url.trim()) || DEFAULT_PORTFOLIO_URL;
-        return `
-          <article class="pg">
-            <div>
-              <h3>${p.name}</h3>
-              ${p.comment ? `<p class="comment">${p.comment}</p>` : ``}
-            </div>
-            <div style="text-align:right; min-width:160px;">
-              ${url}作品を見る</button>
-              <div class="url-line"><a href="${}</a></div>
-            </div>
-          </article>
-        `;
-      }).join('') || `<p>該当のPGが見つかりませんでした。</p>`;
+      if (!list.length) {
+        html = "<p>該当のPGが見つかりませんでした。</p>";
+      } else {
+        for (var i=0;i<list.length;i++) {
+          var p = list[i];
+          var url = (p.portfolio_url && p.portfolio_url.replace(/^\s+|\s+$/g,"")) || DEFAULT_PORTFOLIO_URL;
+          html += '<article class="pg">';
+          html +=   '<div><h3>'+esc(p.name)+'</h3>' + (p.comment?'<p class="comment">'+esc(p.comment)+'</p>':'') + '</div>';
+          html +=   '<div style="text-align:right; min-width:160px;">';
+          html +=     '<button class="btn open-link" type="button" data-href="'+esc(url)+'">作品を見る</button>';
+          html +=     '<div class="url-line"><a href="'+esc(url)+'" target="_self" rel="noreferrer">'+esc(url)+'</a></div>';
+          html +=   '</div>';
+          html += '</article>';
+        }
+      }
+      wrap.innerHTML = html;
 
-      document.getElementById('card').classList.add('hidden');
-      const r = document.getElementById('result');
-      r.classList.remove('hidden');
+      document.getElementById('card').className = "hidden";
+      document.getElementById('result').className = "";
 
-      // 100%遷移させる：同一タブで明示遷移
-      r.querySelectorAll('.open-link').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const href = e.currentTarget.getAttribute('data-href');
-          if (href) window.location.href = href;  // ← 同一タブで必ず遷移
+      var openBtns = document.getElementById('result').getElementsByClassName('open-link');
+      for (var j=0;j<openBtns.length;j++) {
+        openBtns[j].addEventListener('click', function(e){
+          var href = this.getAttribute('data-href');
+          if (href) { window.location.href = href; }
         });
-      });
+      }
 
-      document.getElementById('restart').onclick = () => {
+      document.getElementById('restart').onclick = function(){
         state.step = "q1";
         state.results = null;
         run();
@@ -242,14 +243,21 @@
     }
 
     function run() {
-      if (state.step === "FINAL") { renderResult(); return; }
-      const node = findNode(state.step);
-      if (!node) { state.step = "FINAL"; renderResult(); return; }
-      renderQuestion(node);
+      try {
+        if (state.step === "FINAL") { renderResult(); return; }
+        var node = findNode(state.step);
+        if (!node) { state.step = "FINAL"; renderResult(); return; }
+        renderQuestion(node);
+      } catch (e) {
+        // 画面に直接エラー表示（デバッグ用）
+        var el = document.getElementById('card');
+        el.className = "card";
+        el.innerHTML = "<h2>エラーが発生しました</h2><p>"+esc(e.message)+"</p>";
+      }
     }
 
-    // 初期描画
-    run();
+    // 初期表示
+    window.onload = function(){ run(); };
   </script>
 </body>
 </html>
